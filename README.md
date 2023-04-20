@@ -1,11 +1,21 @@
 <h1 align="center">Project Treemacs</h1>
 <hr>
 <p align="center">
-Treemacs backend for project.el Emacs projects
+Simple treemacs backend for project.el:
+
+* Projects in Treemacs map to project.el projects
+* Workspaces in Treemacs map to project.el external roots
+* `project-find-file`, `project-switch-to-buffer`, `project-find-regexp` et al operate on the current treemacs project.
+* `project-or-external-find-file`, `project-or-external-find-regexp` operate on the current treemacs workspace.
 </p>
 <hr>
 
-# Notable Features
+# Usage
+For the moment, the project-treemacs backend depends on the treemacs side panel being visible. 
+
+Use treemacs as you normally would, creating workspaces, projects, etc. 
+
+Use project.el commands as you normally would, with your project spaces defined by the current treemacs project, and the current treemacs workspace.
 # Examples
 # Links
 # Installing

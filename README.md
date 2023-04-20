@@ -17,6 +17,12 @@ Use treemacs as you normally would, creating workspaces, projects, etc.
 
 Use project.el commands as you normally would, with your project spaces defined by the current treemacs project, and the current treemacs workspace.
 # Examples
+![treemacs-project-search](https://github.com/cmccloud/project-treemacs/blob/master/examples/project-search.gif?raw=true)
+Using `project-find-file` to search for files within the current treemacs project.
+<hr>
+
+![treemacs-workspace-search](https://github.com/cmccloud/project-treemacs/blob/master/examples/workspace-search.gif?raw=true)
+Using `project-or-external-find-file` to search for files within the current treemacs workspace.
 # Links
 # Installing
 Clone this repository and install using `use-package`

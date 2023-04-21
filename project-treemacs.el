@@ -1,6 +1,6 @@
 ;; project-treemacs.el --- project.el for treemacs -*- lexical-binding: t -*-
 
-;; Copyright (C) 2020-2022 Christopher McCloud
+;; Copyright (C) 2020-2023 Christopher McCloud
 
 ;; This file is NOT part of GNU Emacs.
 

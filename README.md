@@ -25,13 +25,14 @@ Using `project-find-file` to search for files within the current treemacs projec
 Using `project-or-external-find-file` to search for files within the current treemacs workspace.
 # Links
 # Installing
-Clone this repository and install using `use-package`
+Clone this repository and install using `use-package`, then enable with by calling `project-treemacs-mode`.
 
 ``` emacs-lisp
 (use-package project-treemacs
   :demand t
   :after treemacs
-  :load-path "path/to/project-treemacs-repository")
+  :load-path "path/to/project-treemacs-repository"
+  :init (project-treemacs-mode))
 ```
 
 

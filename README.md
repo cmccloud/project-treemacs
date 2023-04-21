@@ -23,7 +23,6 @@ Using `project-find-file` to search for files within the current treemacs projec
 
 ![treemacs-workspace-search](https://github.com/cmccloud/project-treemacs/blob/master/examples/workspace-search.gif?raw=true)
 Using `project-or-external-find-file` to search for files within the current treemacs workspace.
-# Links
 # Installing
 Clone this repository and install using `use-package`, then enable with by calling `project-treemacs-mode`.
 
@@ -34,5 +33,14 @@ Clone this repository and install using `use-package`, then enable with by calli
   :load-path "path/to/project-treemacs-repository"
   :init (project-treemacs-mode))
 ```
+# User Options
+* `project-treemacs-ignores` - list of patterns to add to `project-ignores`.
+* `project-treemacs-prefer-backend` - Whether or not to prefer the project-treemacs backend over others. See the commentary in project.el for more information, and the documentation for `project-find-functions` in particular.
+
+# Links
+* [Working with Projects - Emacs Manual](https://www.gnu.org/software/emacs/manual/html_node/emacs/Projects.html)
+
+* [project.el at Emacs Mirror](https://github.com/emacs-mirror/emacs/blob/master/lisp/progmodes/project.el)
+
 
 

@@ -48,6 +48,15 @@ Default value emulates `treemacs--std-ignore-file-predicate'."
   :type '(repeat string)
   :safe #'listp)
 
+(defcustom project-treemacs-prefer-backend t
+  "Whether or not to prefer the project-treemacs backend over others.
+
+When `t' `project-treemacs-try' is placed at the front of
+ `project-find-functions'.
+
+When `nil', `project-treemacs-try' is instead appended to the end
+of `project-find-functions'.")
+
 (defvar project-treemacs--files-cache (make-hash-table)
   "Stores project-treemacs `project-files'.
 Only used when `treemacs-filewatch-mode' is enabled.")
@@ -113,15 +122,34 @@ Only used when `treemacs-filewatch-mode' is enabled.")
 	  (mapcar #'treemacs-project->path
 		  (treemacs-workspace->projects (treemacs-current-workspace)))))
 
-;; Cache invalidation
-(define-advice treemacs--process-file-events
-    (:after (&rest r) update-cache)
-  (project-treemacs--clear-cache))
+;;;###autoload
+(define-minor-mode project-treemacs-mode
+  "Toggles treemacs backend for project.el.
 
-(add-hook 'treemacs-switch-workspace-hook #'project-treemacs--clear-cache)
-
-;; Enable project-treemacs, and prefer it to project-vc
-(add-to-list 'project-find-functions #'project-treemacs-try)
+When enabled, by default, treemacs backend is prefered over other backends, but
+see `project-treemacs-prefer-backend' user option."
+  :group 'project-treemacs
+  :global t
+  (if project-treemacs-mode
+      (progn
+        (define-advice treemacs--process-file-events
+            (:after (&rest r) update-cache)
+          (project-treemacs--clear-cache))
+        (add-hook 'treemacs-switch-workspace-hook
+                  #'project-treemacs--clear-cache)
+        (add-to-list 'project-find-functions
+                     #'project-treemacs-try
+                     (unless project-treemacs-prefer-backend t)))
+    (progn
+      (advice-remove 'update-cache #'treemacs--process-file-events)
+      (remove-hook 'treemacs-switch-workspace-hook
+                   #'project-treemacs--clear-cache)
+      (setq project-find-functions
+            (remq #'project-treemacs-try
+                  project-find-functions))
+      (clrhash project-treemacs--files-cache)
+      (when project-treemacs--idle-timer
+        (cancel-timer project-treemacs--idle-timer)))))
 
 (provide 'project-treemacs)
 

@@ -1,4 +1,4 @@
-;;; project-treemacs.el --- project.el backend for treemacs  -*- lexical-binding: t; -*-
+;;; project-treemacs.el --- Simple treemacs backend for project.el -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020-2023 Christopher McCloud
 
@@ -6,7 +6,6 @@
 ;; URL: https://github.com/cmccloud/project-treemacs
 ;; Version: 0.1
 ;; Package-Requires: ((emacs "28.1") (treemacs "3.1"))
-;; Keywords: treemacs, project
 
 ;; This file is not part of GNU Emacs.
 
@@ -96,7 +95,8 @@ When t `project-treemacs-try' is placed at the front of
  `project-find-functions'.
 
 When nil, `project-treemacs-try' is instead appended to the end
-of `project-find-functions'.")
+of `project-find-functions'."
+  :type '(boolean))
 
 ;;;; Variables
 
@@ -157,11 +157,11 @@ Tests whether DIR is a member of a visible `treemacs' project."
 ;;;;; project.el api
 
 (cl-defmethod project-root ((project treemacs-project))
-  "Return `project-root' for PROJECT in a valid TREEMACS-PROJECT."
+  "Return `project-root' for PROJECT of type TREEMACS-PROJECT."
   (treemacs-project->path project))
 
 (cl-defmethod project-files ((project treemacs-project) &optional dirs)
-  "Return `project-files' for PROJECT in a valid TREEMACS-PROJECT.
+  "Return `project-files' for PROJECT of type TREEMACS-PROJECT.
 
 Optionally accept external project root DIRS."
   (seq-remove (lambda (p) (project-treemacs--ignore-file-p project p))
@@ -169,19 +169,19 @@ Optionally accept external project root DIRS."
 	                  (append (list (project-root project)) dirs))))
 
 (cl-defmethod project-buffers ((project treemacs-project))
-  "Return `project-buffers' for PROJECT in a valid TREEMACS-PROJECT."
+  "Return `project-buffers' for PROJECT of type TREEMACS-PROJECT."
   (let ((root (expand-file-name (file-name-as-directory (project-root project)))))
     (seq-filter
      (lambda (buf)
        (string-prefix-p root (buffer-local-value 'default-directory buf)))
      (buffer-list))))
 
-(cl-defmethod project-ignores ((project treemacs-project) _dir)
-  "Return `project-ignores' for PROJECT in a valid TREEMACS-PROJECT."
+(cl-defmethod project-ignores ((_project treemacs-project) _dir)
+  "Return `project-ignores' in a TREEMACS-PROJECT."
   project-treemacs-ignores)
 
 (cl-defmethod project-external-roots ((project treemacs-project))
-  "Return `project-external-roots' for PROJECT in a valid TREEMACS-PROJECT."
+  "Return `project-external-roots' for PROJECT of type TREEMACS-PROJECT."
   (remove (project-root project)
 	  (mapcar #'treemacs-project->path
 		  (treemacs-workspace->projects (treemacs-current-workspace)))))
@@ -199,7 +199,7 @@ see `project-treemacs-prefer-backend' user option."
   (if project-treemacs-mode
       (progn
         (define-advice treemacs--process-file-events
-            (:after (&rest r) update-cache)
+            (:after (&rest _r) update-cache)
           (project-treemacs--clear-cache))
         (add-hook 'treemacs-switch-workspace-hook
                   #'project-treemacs--clear-cache)

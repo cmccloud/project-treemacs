@@ -92,10 +92,10 @@ Default value emulates `treemacs--std-ignore-file-predicate'."
 (defcustom project-treemacs-prefer-backend t
   "Whether or not to prefer the project-treemacs backend over others.
 
-When `t' `project-treemacs-try' is placed at the front of
+When t `project-treemacs-try' is placed at the front of
  `project-find-functions'.
 
-When `nil', `project-treemacs-try' is instead appended to the end
+When nil, `project-treemacs-try' is instead appended to the end
 of `project-find-functions'.")
 
 ;;;; Variables
@@ -114,7 +114,7 @@ Only used when `treemacs-filewatch-mode' is enabled.")
 (defun project-treemacs-try (dir)
   "Treemacs backend for use in `project-find-functions'.
 
-Tests whether current buffer is a member of a visible `treemacs' project."
+Tests whether DIR is a member of a visible `treemacs' project."
   (when (and (fboundp 'treemacs-current-visibility)
 	     (eq (treemacs-current-visibility) 'visible))
     (treemacs--find-project-for-path dir)))
@@ -122,7 +122,7 @@ Tests whether current buffer is a member of a visible `treemacs' project."
 ;;;;; Private
 
 (defun project-treemacs--clear-cache ()
-  "Clears `project-treemacs--files-cache' and updates when idle."
+  "Clears `project-treemacs--files-cache' and update when idle."
   (when treemacs-filewatch-mode
     (let (keys)
       (maphash (lambda (k _v) (push k keys)) project-treemacs--files-cache)
@@ -134,43 +134,54 @@ Tests whether current buffer is a member of a visible `treemacs' project."
 	      (run-with-idle-timer 1 nil #'project-treemacs--update-cache keys))))))
 
 (defun project-treemacs--update-cache (directories)
+  "Update the cache for paths in given DIRECTORIES."
   (seq-each (lambda (d) (project-treemacs--get-files-for-dir d)) directories)
   (cancel-timer project-treemacs--idle-timer)
   (setq project-treemacs--idle-timer nil))
 
 (defun project-treemacs--explore-dir-p (dir-name)
+  "Test whether DIR-NAME matches against `project-ignores'."
   (not (seq-some (lambda (glob) (string-match-p glob dir-name))
                  (project-ignores (project-current) ""))))
 
 (defun project-treemacs--ignore-file-p (project path)
+  "Test whether file at PATH should be ignored within PROJECT."
   (seq-contains-p (project-ignores project nil) path #'string-match-p))
 
 (defun project-treemacs--get-files-for-dir (dir)
+  "Return value of DIR in cache."
   (or (and treemacs-filewatch-mode (gethash dir project-treemacs--files-cache))
       (puthash dir (directory-files-recursively dir ".*" nil #'project-treemacs--explore-dir-p nil)
 	       project-treemacs--files-cache)))
 
-;;;;; project.el api  
+;;;;; project.el api
 
 (cl-defmethod project-root ((project treemacs-project))
+  "Return `project-root' for PROJECT in a valid TREEMACS-PROJECT."
   (treemacs-project->path project))
 
 (cl-defmethod project-files ((project treemacs-project) &optional dirs)
+  "Return `project-files' for PROJECT in a valid TREEMACS-PROJECT.
+
+Optionally accept external project root DIRS."
   (seq-remove (lambda (p) (project-treemacs--ignore-file-p project p))
               (seq-mapcat #'project-treemacs--get-files-for-dir
 	                  (append (list (project-root project)) dirs))))
 
 (cl-defmethod project-buffers ((project treemacs-project))
+  "Return `project-buffers' for PROJECT in a valid TREEMACS-PROJECT."
   (let ((root (expand-file-name (file-name-as-directory (project-root project)))))
     (seq-filter
      (lambda (buf)
        (string-prefix-p root (buffer-local-value 'default-directory buf)))
      (buffer-list))))
 
-(cl-defmethod project-ignores ((project treemacs-project) dir)
+(cl-defmethod project-ignores ((project treemacs-project) _dir)
+  "Return `project-ignores' for PROJECT in a valid TREEMACS-PROJECT."
   project-treemacs-ignores)
 
 (cl-defmethod project-external-roots ((project treemacs-project))
+  "Return `project-external-roots' for PROJECT in a valid TREEMACS-PROJECT."
   (remove (project-root project)
 	  (mapcar #'treemacs-project->path
 		  (treemacs-workspace->projects (treemacs-current-workspace)))))

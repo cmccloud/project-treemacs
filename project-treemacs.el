@@ -6,7 +6,7 @@
 ;; URL: https://github.com/cmccloud/project-treemacs
 ;; Version: 0.1
 ;; Package-Requires: ((emacs "28.1") (treemacs "3.1"))
-;; Keywords:
+;; Keywords: treemacs, project
 
 ;; This file is not part of GNU Emacs.
 

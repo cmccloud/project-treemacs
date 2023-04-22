@@ -158,7 +158,7 @@ Tests whether DIR is a member of a visible `treemacs' project."
 
 (cl-defmethod project-root ((project treemacs-project))
   "Return `project-root' for PROJECT of type TREEMACS-PROJECT."
-  (treemacs-project->path project))
+  (concat (treemacs-project->path project) "/"))
 
 (cl-defmethod project-files ((project treemacs-project) &optional dirs)
   "Return `project-files' for PROJECT of type TREEMACS-PROJECT.
@@ -183,7 +183,7 @@ Optionally accept external project root DIRS."
 (cl-defmethod project-external-roots ((project treemacs-project))
   "Return `project-external-roots' for PROJECT of type TREEMACS-PROJECT."
   (remove (project-root project)
-	  (mapcar #'treemacs-project->path
+	  (mapcar #'project-root
 		  (treemacs-workspace->projects (treemacs-current-workspace)))))
 
 ;;;;; Modes

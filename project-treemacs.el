@@ -24,16 +24,8 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;;
-;; Simple treemacs backend for project.el:
-;; Treemacs Project -> project.el Project
-;; Treemacs Workspace -> project.el External Roots
-;; 
-;; `project-find-file', `project-switch-to-buffer', `project-find-regexp' et al
-;; operate on the current treemacs project.
-;; 
-;; `project-or-external-find-file', and `project-or-external-find-regexp'
-;; operate on the current treemacs workspace.
+
+;; Simple treemacs backend for project.el
 
 ;;;; Installation
 
@@ -64,6 +56,15 @@
 ;; Enable the backend with `project-treemacs-mode'
 ;; With the `treemacs' side panel visible, use any of the `project.el'
 ;; project management commands as you normally would.
+
+;; Treemacs projects map to project.el projects
+;; Treemacs workspaces map project.el projects + project external roots
+
+;; `project-find-file', `project-switch-to-buffer', `project-find-regexp' et al
+;; operate on the current treemacs project.
+
+;; `project-or-external-find-file', and `project-or-external-find-regexp'
+;; operate on the current treemacs workspace.
 
 ;;;; Tips
 ;; You can customize settings in the `project-treemacs' group.

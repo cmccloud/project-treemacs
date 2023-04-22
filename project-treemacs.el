@@ -1,24 +1,27 @@
-;; project-treemacs.el --- project.el for treemacs -*- lexical-binding: t -*-
+;;; project-treemacs.el --- project.el backend for treemacs  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020-2023 Christopher McCloud
 
-;; This file is NOT part of GNU Emacs.
+;; Author: Christopher McCloud
+;; URL: https://github.com/cmccloud/project-treemacs
+;; Version: 0.1
+;; Package-Requires: ((emacs "28.1") (treemacs "3.1"))
+;; Keywords:
 
-;;; License:
+;; This file is not part of GNU Emacs.
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 3, or (at your option)
-;; any later version.
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
 
 ;; This program is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
-;;
 
-;; For a full copy of the GNU General Public License
-;; see <http://www.gnu.org/licenses/>.
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 ;;
@@ -31,15 +34,52 @@
 ;; 
 ;; `project-or-external-find-file', and `project-or-external-find-regexp'
 ;; operate on the current treemacs workspace.
-;; 
+
+;;;; Installation
+
+;;;;; MELPA
+
+;; If you installed from MELPA, you're done.
+
+;;;;; Manual
+
+;; Install these required packages:
+
+;; `treemacs'
+
+;; Then put this file in your load-path, and put this in your init
+;; file:
+
+;; (require 'project-treemacs)
+
+;; Or using `use-package':
+
+;; (use-package project-treemacs
+;;   :demand t
+;;   :after treemacs
+;;   :load-path "path/to/project-treemacs")
+
+;;;; Usage
+
+;; Enable the backend with `project-treemacs-mode'
+;; With the `treemacs' side panel visible, use any of the `project.el'
+;; project management commands as you normally would.
+
+;;;; Tips
+;; You can customize settings in the `project-treemacs' group.
 
 ;;; Code:
+
+;;;; Requirements
+
 (require 'seq)
 (require 'treemacs)
 (require 'project)
 
+;;;; Customization
+
 (defgroup project-treemacs nil
-  "Project implementation based on the Treemacs package."
+  "Project backend using `treemacs'."
   :group 'project)
 
 (defcustom project-treemacs-ignores '("^\\.#" "^flycheck_" "~$" "\\.git/")
@@ -57,11 +97,28 @@ When `t' `project-treemacs-try' is placed at the front of
 When `nil', `project-treemacs-try' is instead appended to the end
 of `project-find-functions'.")
 
+;;;; Variables
+
 (defvar project-treemacs--files-cache (make-hash-table)
   "Stores project-treemacs `project-files'.
 Only used when `treemacs-filewatch-mode' is enabled.")
 
 (defvar project-treemacs--idle-timer nil)
+
+;;;; Functions
+
+;;;;; Public
+
+;;;###autoload
+(defun project-treemacs-try (dir)
+  "Treemacs backend for use in `project-find-functions'.
+
+Tests whether current buffer is a member of a visible `treemacs' project."
+  (when (and (fboundp 'treemacs-current-visibility)
+	     (eq (treemacs-current-visibility) 'visible))
+    (treemacs--find-project-for-path dir)))
+
+;;;;; Private
 
 (defun project-treemacs--clear-cache ()
   "Clears `project-treemacs--files-cache' and updates when idle."
@@ -92,12 +149,7 @@ Only used when `treemacs-filewatch-mode' is enabled.")
       (puthash dir (directory-files-recursively dir ".*" nil #'project-treemacs--explore-dir-p nil)
 	       project-treemacs--files-cache)))
 
-;; Project.el API
-;;;###autoload
-(defun project-treemacs-try (dir)
-  (when (and (fboundp 'treemacs-current-visibility)
-	     (eq (treemacs-current-visibility) 'visible))
-    (treemacs--find-project-for-path dir)))
+;;;;; project.el api  
 
 (cl-defmethod project-root ((project treemacs-project))
   (treemacs-project->path project))
@@ -121,6 +173,8 @@ Only used when `treemacs-filewatch-mode' is enabled.")
   (remove (project-root project)
 	  (mapcar #'treemacs-project->path
 		  (treemacs-workspace->projects (treemacs-current-workspace)))))
+
+;;;;; Modes
 
 ;;;###autoload
 (define-minor-mode project-treemacs-mode
@@ -151,6 +205,8 @@ see `project-treemacs-prefer-backend' user option."
       (when project-treemacs--idle-timer
         (cancel-timer project-treemacs--idle-timer)))))
 
+;;;; Footer
+
 (provide 'project-treemacs)
 
-;; project-treemacs.el ends here
+;;; project-treemacs.el ends here

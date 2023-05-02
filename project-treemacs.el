@@ -207,7 +207,8 @@ see `project-treemacs-prefer-backend' user option."
                      #'project-treemacs-try
                      (unless project-treemacs-prefer-backend t)))
     (progn
-      (advice-remove 'update-cache #'treemacs--process-file-events)
+      (advice-remove #'treemacs--process-file-events
+                     'treemacs--process-file-events@update-cache)
       (remove-hook 'treemacs-switch-workspace-hook
                    #'project-treemacs--clear-cache)
       (setq project-find-functions

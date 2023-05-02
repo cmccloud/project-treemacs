@@ -154,6 +154,9 @@ Tests whether DIR is a member of a visible `treemacs' project."
       (puthash dir (directory-files-recursively dir ".*" nil #'project-treemacs--explore-dir-p nil)
 	       project-treemacs--files-cache)))
 
+(defun project-treemacs--update-cache-advice (&rest _r)
+  (project-treemacs--clear-cache))
+
 ;;;;; project.el api
 
 (cl-defmethod project-root ((project treemacs-project))
@@ -198,9 +201,9 @@ see `project-treemacs-prefer-backend' user option."
   :global t
   (if project-treemacs-mode
       (progn
-        (define-advice treemacs--process-file-events
-            (:after (&rest _r) update-cache)
-          (project-treemacs--clear-cache))
+        (advice-add 'treemacs--process-file-events
+                    :after
+                    #'project-treemacs--update-cache-advice)
         (add-hook 'treemacs-switch-workspace-hook
                   #'project-treemacs--clear-cache)
         (add-to-list 'project-find-functions
@@ -208,7 +211,7 @@ see `project-treemacs-prefer-backend' user option."
                      (unless project-treemacs-prefer-backend t)))
     (progn
       (advice-remove #'treemacs--process-file-events
-                     'treemacs--process-file-events@update-cache)
+                     'project-treemacs--update-cache-advice)
       (remove-hook 'treemacs-switch-workspace-hook
                    #'project-treemacs--clear-cache)
       (setq project-find-functions

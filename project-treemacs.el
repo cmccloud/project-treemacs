@@ -155,6 +155,10 @@ Tests whether DIR is a member of a visible `treemacs' project."
 	       project-treemacs--files-cache)))
 
 (defun project-treemacs--update-cache-advice (&rest _r)
+  "Clear cache after `treemacs--process-file-events' is run.
+
+Attached when `project-treemacs-mode' is enabled.
+Removed when `project-treemacs-mode' is disabled."
   (project-treemacs--clear-cache))
 
 ;;;;; project.el api

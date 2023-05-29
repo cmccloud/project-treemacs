@@ -213,17 +213,16 @@ see `project-treemacs-prefer-backend' user option."
         (add-to-list 'project-find-functions
                      #'project-treemacs-try
                      (unless project-treemacs-prefer-backend t)))
-    (progn
-      (advice-remove #'treemacs--process-file-events
-                     'project-treemacs--update-cache-advice)
-      (remove-hook 'treemacs-switch-workspace-hook
-                   #'project-treemacs--clear-cache)
-      (setq project-find-functions
-            (remq #'project-treemacs-try
-                  project-find-functions))
-      (clrhash project-treemacs--files-cache)
-      (when project-treemacs--idle-timer
-        (cancel-timer project-treemacs--idle-timer)))))
+    (advice-remove #'treemacs--process-file-events
+                   'project-treemacs--update-cache-advice)
+    (remove-hook 'treemacs-switch-workspace-hook
+                 #'project-treemacs--clear-cache)
+    (setq project-find-functions
+          (remq #'project-treemacs-try
+                project-find-functions))
+    (clrhash project-treemacs--files-cache)
+    (when project-treemacs--idle-timer
+      (cancel-timer project-treemacs--idle-timer))))
 
 ;;;; Footer
 

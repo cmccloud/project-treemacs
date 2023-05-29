@@ -116,7 +116,7 @@ Only used when `treemacs-filewatch-mode' is enabled.")
 
 Tests whether DIR is a member of a visible `treemacs' project."
   (when (and (fboundp 'treemacs-current-visibility)
-	     (eq (treemacs-current-visibility) 'visible))
+             (eq (treemacs-current-visibility) 'visible))
     (treemacs--find-project-for-path dir)))
 
 ;;;;; Private
